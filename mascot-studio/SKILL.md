@@ -111,11 +111,12 @@ file the user can embed.
 
 Wire the component into the user's product so it reacts to real events. See
 `references/integration.md` for the safe-hooks pattern (guarded calls, a small
-event→state map, show/hide per screen) and packaging notes.
+event→state map, show/hide per screen), screen-fit placement (corner vs inline,
+so the mascot never shoves the host's UI around), and packaging notes.
 
 Deliverable: the component added to the project, reaction calls placed at the
 real event sites, a standalone preview page, and build-config updated so the
-asset ships.
+asset ships — with the host's layout and tests verified intact.
 
 ## Rendering approach
 

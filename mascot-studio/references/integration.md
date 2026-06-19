@@ -45,9 +45,60 @@ if (['quiz','lesson','passed','failed'].includes(screen)) { Buddy.show(); if (sc
 else Buddy.hide();
 ```
 
+## 4b. Place it so it can't break the layout
+
+Once a screen *should* show the mascot (§4), decide *where on it* the mascot
+sits. That's set by how much room the screen has — not by taste; get it wrong and
+the character pushes the real UI around. Two patterns:
+
+- **Sparse screens** (welcome, result / celebration, empty states) — drop an
+  inline host straight into the flow, or go big with a hero pose. There's room;
+  let it be the centrepiece.
+- **Dense screens** (a form, a quiz card with an input + keypad, anything inside
+  a height-constrained or scrolling container) — **do not inject an inline block
+  into the content flow.** A ~100px mascot wedged between elements pushes the real
+  controls down and can force the card to overflow and scroll; on a fixed-height
+  kiosk it can shove the submit button off-screen. Float it in a corner instead.
+
+The corner pattern, done right:
+
+```css
+/* Anchor to a NON-clipping ancestor, not the scrolling card itself. */
+.screen { position: relative; }          /* the card's container */
+.mascotHost {                            /* one host, reused across screens */
+  position: absolute; top: 8px; right: 8px;
+  width: 96px; height: 108px; z-index: 6;
+  pointer-events: none;                  /* taps pass straight through */
+}
+```
+
+Two traps the corner avoids:
+- **Speech-bubble clipping.** Setting only `overflow-y:auto` forces the computed
+  `overflow-x` to `auto` too (CSS won't leave one axis `visible` beside a
+  scrolling one), so the card becomes a scroll box that can't paint a child
+  outside its edges — an in-card overlay gets its upward bubble cut off. Anchor
+  the host to an *outer* element that doesn't clip, and the bubble renders over
+  the background instead of being chopped at the card edge.
+- **Blocking input.** `pointer-events:none` lets the mascot overlap a button
+  without ever eating a tap.
+
+Keep **one** host element and move the single instance into the active screen on
+each switch (`attachTo`) — don't mint a copy per screen.
+
+Whichever pattern you pick, prove it (see §6): the mascot must not introduce
+overflow, scroll, or cover a control on the densest screen at the shortest
+viewport you support.
+
 ## 5. Make it ship
 
 - Add the `<script src="assets/buddy.js"></script>` tag (after the host script).
+- **Watch for naive `<script>` extraction.** Adding this external tag can break
+  host tooling that pulls the inline script with a *greedy*
+  `/<script>([\s\S]*)<\/script>/` — the match now runs to the *last* `</script>`
+  (yours), swallowing the closing tag and failing to parse ("Unexpected token
+  '<'"). If a smoke test or build step does this, make it non-greedy
+  (`[\s\S]*?`) or target the inline block specifically. Grep the host for
+  `<script>` extraction before assuming the tag is harmless.
 - If the project has a packager allow-list (e.g. electron-builder `build.files`,
   a manifest, a bundler config), **add the new asset to it** — otherwise it works
   in dev but is missing from the built app.
@@ -58,6 +109,12 @@ else Buddy.hide();
 
 - `node --check` the component and any JSON you edited (e.g. `package.json`).
 - Grep the host to confirm every intended hook is present.
+- **Render it and check the layout didn't move.** Open the host (drive a browser
+  to the real screens) and confirm the mascot introduced no overflow/scroll,
+  pushed nothing off-screen, and covers no control — test the densest screen at
+  the shortest viewport you support. `card.scrollHeight > card.clientHeight` is a
+  fast programmatic regression check; the speech bubble must render unclipped.
+- Re-run the host's smoke/test suite (see §5 for why your `<script>` tag can trip it).
 - Note for the user: a previously *installed/built* app won't have the changes —
   they must run the dev build or rebuild to see them.
 
