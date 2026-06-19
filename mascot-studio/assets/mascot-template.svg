@@ -1,0 +1,29 @@
+<svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+  <title>Mascot construction starter — replace the generic creature with your character</title>
+  <!-- PALETTE (swap to the brand): body #2DC6C0  outline/detail #14857F
+       light/belly #E9FBF9  signature #FFC23C  cheek #FF9E8F  ink #14302E
+       Keep ONE outline weight. On a dark brand background, drop the outline
+       and use a bright flat fill instead. -->
+
+  <!-- LOCK these primitive coords and reuse them for every expression + the
+       animated component. That is what keeps the character on-model. -->
+
+  <!-- signature feature (the thing that makes the silhouette unique) -->
+  <path d="M160 96 C140 74 146 44 172 36 C184 60 178 86 160 98 Z"
+        fill="#FFC23C" stroke="#E0A500" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- arms (give stable ids if you'll animate a wave) -->
+  <g transform="rotate(-18 74 206)"><ellipse cx="74" cy="206" rx="14" ry="24" fill="#2DC6C0"/></g>
+  <g transform="rotate(18 246 206)"><ellipse cx="246" cy="206" rx="14" ry="24" fill="#2DC6C0"/></g>
+
+  <!-- body: main mass + belly + cheeks (one fill, overlap = clean union) -->
+  <ellipse cx="160" cy="190" rx="104" ry="110" fill="#2DC6C0" stroke="#14857F" stroke-width="6"/>
+  <ellipse cx="160" cy="214" rx="66" ry="74" fill="#E9FBF9"/>
+  <circle cx="104" cy="214" r="13" fill="#FF9E8F"/><circle cx="216" cy="214" r="13" fill="#FF9E8F"/>
+
+  <!-- face: big eyes (white + pupil + highlight) close together = friendly -->
+  <circle cx="134" cy="180" r="22" fill="#fff"/><circle cx="186" cy="180" r="22" fill="#fff"/>
+  <circle cx="139" cy="183" r="11" fill="#14302E"/><circle cx="181" cy="183" r="11" fill="#14302E"/>
+  <circle cx="135" cy="177" r="4.5" fill="#fff"/><circle cx="177" cy="177" r="4.5" fill="#fff"/>
+  <path d="M138 202 Q160 226 182 202 Q160 214 138 202 Z" fill="#14302E"/>
+</svg>
